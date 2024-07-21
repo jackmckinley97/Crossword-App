@@ -21,6 +21,8 @@
 		723891B42C38DD7500A7B7CD /* LoadOrCreateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 723891B32C38DD7500A7B7CD /* LoadOrCreateView.swift */; };
 		723891B62C38E85900A7B7CD /* KeyboardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 723891B52C38E85900A7B7CD /* KeyboardViewController.swift */; };
 		723891BA2C39FAE600A7B7CD /* CrosswordDataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 723891B92C39FAE600A7B7CD /* CrosswordDataService.swift */; };
+		728BA7032C4DA9A3008AF785 /* CrosswordBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 728BA7022C4DA9A3008AF785 /* CrosswordBlock.swift */; };
+		728BA7052C4DAC60008AF785 /* UpdateViewOnUserInteraction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 728BA7042C4DAC60008AF785 /* UpdateViewOnUserInteraction.swift */; };
 		729DC2062B2FACB40059B355 /* CreateSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 729DC2052B2FACB40059B355 /* CreateSettingsView.swift */; };
 		729DC2082B2FACCF0059B355 /* PlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 729DC2072B2FACCF0059B355 /* PlayView.swift */; };
 		729DC20A2B2FE9C60059B355 /* CreateCluesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 729DC2092B2FE9C60059B355 /* CreateCluesView.swift */; };
@@ -65,6 +67,8 @@
 		723891B32C38DD7500A7B7CD /* LoadOrCreateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadOrCreateView.swift; sourceTree = "<group>"; };
 		723891B52C38E85900A7B7CD /* KeyboardViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardViewController.swift; sourceTree = "<group>"; };
 		723891B92C39FAE600A7B7CD /* CrosswordDataService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrosswordDataService.swift; sourceTree = "<group>"; };
+		728BA7022C4DA9A3008AF785 /* CrosswordBlock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrosswordBlock.swift; sourceTree = "<group>"; };
+		728BA7042C4DAC60008AF785 /* UpdateViewOnUserInteraction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateViewOnUserInteraction.swift; sourceTree = "<group>"; };
 		729DC2052B2FACB40059B355 /* CreateSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateSettingsView.swift; sourceTree = "<group>"; };
 		729DC2072B2FACCF0059B355 /* PlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayView.swift; sourceTree = "<group>"; };
 		729DC2092B2FE9C60059B355 /* CreateCluesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateCluesView.swift; sourceTree = "<group>"; };
@@ -160,6 +164,8 @@
 			isa = PBXGroup;
 			children = (
 				72299DE32B2BD39A0024EA78 /* CreateCrosswordView.swift */,
+				728BA7042C4DAC60008AF785 /* UpdateViewOnUserInteraction.swift */,
+				728BA7022C4DA9A3008AF785 /* CrosswordBlock.swift */,
 			);
 			path = "Create Crossword";
 			sourceTree = "<group>";
@@ -383,7 +389,9 @@
 				72299DE62B2BD3A90024EA78 /* CrosswordKeyboard.swift in Sources */,
 				723891BA2C39FAE600A7B7CD /* CrosswordDataService.swift in Sources */,
 				7202B8262C4312EE00602EB5 /* AlertController.swift in Sources */,
+				728BA7052C4DAC60008AF785 /* UpdateViewOnUserInteraction.swift in Sources */,
 				7202B8282C43138000602EB5 /* UIAlertControllerWrapper.swift in Sources */,
+				728BA7032C4DA9A3008AF785 /* CrosswordBlock.swift in Sources */,
 				729DC2082B2FACCF0059B355 /* PlayView.swift in Sources */,
 				729DC20F2B3886D60059B355 /* CrosswordFill.swift in Sources */,
 				720BC66C2B2A91BF0048C2DE /* MainView.swift in Sources */,

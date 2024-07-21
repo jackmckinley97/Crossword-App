@@ -1,6 +1,8 @@
 import SwiftUI
 import Foundation
 
+
+
 struct WordEntry: Identifiable {
     let id = UUID()
     let word: String
@@ -23,8 +25,9 @@ struct Crossword: Identifiable, Codable {
     var clues: [UUID: String]
 }
 
+import SwiftUI
+
 struct CreateCrosswordView: View {
-    
     @State private var blockText: [[String]]
     @State private var horizontalType = true
     @State private var acrossClues: [[Bool]]
@@ -60,9 +63,7 @@ struct CreateCrosswordView: View {
         "\(xCoordinate),\(yCoordinate)"
     }
 
-    private func updateClueNumbersIfNeeded() {
-        updateClueNumbers()
-    }
+    @State private var interactionHandler: UpdateViewOnUserInteraction?
 
     init(gridSize: Int) {
         self.gridSize = gridSize
@@ -85,59 +86,6 @@ struct CreateCrosswordView: View {
         self._crosswordID = State(initialValue: crossword.id)
     }
 
-    func updateIsWordSelected() {
-        isWordSelected = Array(repeating: Array(repeating: false, count: gridSize), count: gridSize)
-
-        guard blockText.indices.contains(yCoordinate), blockText[yCoordinate].indices.contains(xCoordinate), blockText[yCoordinate][xCoordinate] != "." else {
-            return
-        }
-        guard !isBlackSquareModeOn else {
-            return
-        }
-
-        var currentRow = yCoordinate
-        var currentCol = xCoordinate
-
-        if horizontalType {
-            while currentCol < gridSize {
-                if blockText[currentRow][currentCol] == "." {
-                    break
-                }
-                isWordSelected[currentRow][currentCol] = true
-                currentCol += 1
-            }
-        } else {
-            while currentRow < gridSize {
-                if blockText[currentRow][currentCol] == "." {
-                    break
-                }
-                isWordSelected[currentRow][currentCol] = true
-                currentRow += 1
-            }
-        }
-
-        currentRow = yCoordinate
-        currentCol = xCoordinate
-
-        if horizontalType {
-            while currentCol >= 0 {
-                if blockText[currentRow][currentCol] == "." {
-                    break
-                }
-                isWordSelected[currentRow][currentCol] = true
-                currentCol -= 1
-            }
-        } else {
-            while currentRow >= 0 {
-                if blockText[currentRow][currentCol] == "." {
-                    break
-                }
-                isWordSelected[currentRow][currentCol] = true
-                currentRow -= 1
-            }
-        }
-    }
-
     var selectedBinding: Binding<String> {
         Binding<String>(
             get: {
@@ -153,321 +101,6 @@ struct CreateCrosswordView: View {
                 blockText[yCoordinate][xCoordinate] = $0
             }
         )
-    }
-
-    private func updateWordEntries() {
-        wordEntries.removeAll()
-
-        for row in 0..<gridSize {
-            for col in 0..<gridSize {
-                if let clueNumber = clueNumbers[row][col] {
-                    if acrossClues[row][col] {
-                        if let acrossWord = extractWord(at: row, col: col, direction: .across) {
-                            let wordEntry = WordEntry(word: acrossWord, clueNumber: clueNumber, direction: .across, filledOutLetters: [])
-                            wordEntries.append(wordEntry)
-                        }
-                    }
-
-                    if downClues[row][col] {
-                        if let downWord = extractWord(at: row, col: col, direction: .down) {
-                            let wordEntry = WordEntry(word: downWord, clueNumber: clueNumber, direction: .down, filledOutLetters: [])
-                            wordEntries.append(wordEntry)
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    func increaseSelectedIndex() {
-        if horizontalType {
-            repeat {
-                xCoordinate = (xCoordinate + 1) % gridSize
-                if xCoordinate == 0 {
-                    yCoordinate = (yCoordinate + 1) % gridSize
-                }
-            } while blockText[yCoordinate][xCoordinate] == "."
-        } else {
-            repeat {
-                if yCoordinate == gridSize - 1 {
-                    xCoordinate = (xCoordinate + 1) % gridSize
-                    yCoordinate = 0
-                } else {
-                    yCoordinate = (yCoordinate + 1) % gridSize
-                }
-            } while blockText[yCoordinate][xCoordinate] == "."
-        }
-    }
-
-    func decreaseSelectedIndex() {
-        if horizontalType {
-            repeat {
-                if xCoordinate == 0 {
-                    yCoordinate = (yCoordinate - 1 + gridSize) % gridSize
-                    xCoordinate = gridSize - 1
-                } else {
-                    xCoordinate = (xCoordinate - 1 + gridSize) % gridSize
-                }
-            } while blockText[yCoordinate][xCoordinate] == "."
-        } else {
-            repeat {
-                if yCoordinate == 0 {
-                    xCoordinate = (xCoordinate - 1 + gridSize) % gridSize
-                    yCoordinate = gridSize - 1
-                } else {
-                    yCoordinate = (yCoordinate - 1 + gridSize) % gridSize
-                }
-            } while blockText[yCoordinate][xCoordinate] == "."
-        }
-    }
-
-    func findFirstNonBlackSquare() -> (Int, Int) {
-        for row in 0..<gridSize {
-            for col in 0..<gridSize {
-                if blockText[row][col] != "." {
-                    return (row, col)
-                }
-            }
-        }
-        return (0, 0)
-    }
-
-    func toggleBlackSquareMode() {
-        isBlackSquareModeOn.toggle()
-        if isBlackSquareModeOn {
-            xCoordinate = -1
-            yCoordinate = -1
-        } else {
-            let (newY, newX) = findFirstNonBlackSquare()
-            yCoordinate = newY
-            xCoordinate = newX
-        }
-    }
-
-    private func findStartOfCurrentAcrossWord() -> (row: Int, col: Int)? {
-        var currentCol = xCoordinate
-        while currentCol >= 0 {
-            if clueNumbers[yCoordinate][currentCol] != nil && acrossClues[yCoordinate][currentCol] {
-                return (yCoordinate, currentCol)
-            }
-            currentCol -= 1
-        }
-        return nil
-    }
-
-    private func findStartOfCurrentWord() -> (row: Int, col: Int)? {
-        if horizontalType {
-            var currentCol = xCoordinate
-            while currentCol >= 0 {
-                if clueNumbers[yCoordinate][currentCol] != nil && acrossClues[yCoordinate][currentCol] {
-                    return (yCoordinate, currentCol)
-                }
-                currentCol -= 1
-            }
-        } else {
-            var currentRow = yCoordinate
-            while currentRow >= 0 {
-                if clueNumbers[currentRow][xCoordinate] != nil && downClues[currentRow][xCoordinate] {
-                    return (currentRow, xCoordinate)
-                }
-                currentRow -= 1
-            }
-        }
-        return nil
-    }
-
-    func nextWord() {
-        guard !isBlackSquareModeOn else { return }
-        if horizontalType {
-            moveToNextAcrossWord()
-        } else {
-            moveToNextDownWord()
-        }
-    }
-
-    func previousWord() {
-        guard !isBlackSquareModeOn else { return }
-        if horizontalType {
-            moveToPreviousAcrossWord()
-        } else {
-            moveToPreviousDownWord()
-        }
-    }
-
-    private func moveToNextAcrossWord() {
-        guard let start = findStartOfCurrentAcrossWord() else { return }
-
-        var foundNext = false
-
-        for col in (start.col + 1)..<gridSize {
-            if clueNumbers[start.row][col] != nil && acrossClues[start.row][col] {
-                xCoordinate = col
-                yCoordinate = start.row
-                updateIsWordSelected()
-                foundNext = true
-                break
-            }
-        }
-
-        if !foundNext {
-            for row in (start.row + 1)..<gridSize {
-                for col in 0..<gridSize {
-                    if clueNumbers[row][col] != nil && acrossClues[row][col] {
-                        xCoordinate = col
-                        yCoordinate = row
-                        updateIsWordSelected()
-                        foundNext = true
-                        break
-                    }
-                }
-                if foundNext { break }
-            }
-        }
-
-        if !foundNext {
-            for row in 0...start.row {
-                for col in 0..<gridSize {
-                    if clueNumbers[row][col] != nil && acrossClues[row][col] {
-                        xCoordinate = col
-                        yCoordinate = row
-                        updateIsWordSelected()
-                        return
-                    }
-                }
-            }
-        }
-    }
-
-    private func moveToPreviousAcrossWord() {
-        guard let start = findStartOfCurrentAcrossWord() else { return }
-
-        var foundPrevious = false
-
-        for col in stride(from: start.col - 1, through: 0, by: -1) {
-            if clueNumbers[start.row][col] != nil && acrossClues[start.row][col] {
-                xCoordinate = col
-                yCoordinate = start.row
-                updateIsWordSelected()
-                foundPrevious = true
-                break
-            }
-        }
-
-        if !foundPrevious {
-            for row in stride(from: start.row - 1, through: 0, by: -1) {
-                for col in stride(from: gridSize - 1, through: 0, by: -1) {
-                    if clueNumbers[row][col] != nil && acrossClues[row][col] {
-                        xCoordinate = col
-                        yCoordinate = row
-                        updateIsWordSelected()
-                        foundPrevious = true
-                        break
-                    }
-                }
-                if foundPrevious { break }
-            }
-        }
-
-        if !foundPrevious {
-            for row in stride(from: gridSize - 1, through: start.row + 1, by: -1) {
-                for col in stride(from: gridSize - 1, through: 0, by: -1) {
-                    if clueNumbers[row][col] != nil && acrossClues[row][col] {
-                        xCoordinate = col
-                        yCoordinate = row
-                        updateIsWordSelected()
-                        return
-                    }
-                }
-            }
-        }
-    }
-
-    private func moveToNextDownWord() {
-        guard let start = findStartOfCurrentWord() else { return }
-
-        var foundNext = false
-
-        for col in (start.col + 1)..<gridSize {
-            if clueNumbers[start.row][col] != nil && downClues[start.row][col] {
-                xCoordinate = col
-                yCoordinate = start.row
-                updateIsWordSelected()
-                foundNext = true
-                break
-            }
-        }
-
-        if !foundNext {
-            for row in (start.row + 1)..<gridSize {
-                for col in 0..<gridSize {
-                    if clueNumbers[row][col] != nil && downClues[row][col] {
-                        xCoordinate = col
-                        yCoordinate = row
-                        updateIsWordSelected()
-                        foundNext = true
-                        break
-                    }
-                }
-                if foundNext { break }
-            }
-        }
-
-        if !foundNext {
-            for row in 0...start.row {
-                for col in 0..<gridSize {
-                    if clueNumbers[row][col] != nil && downClues[row][col] {
-                        xCoordinate = col
-                        yCoordinate = row
-                        updateIsWordSelected()
-                        return
-                    }
-                }
-            }
-        }
-    }
-
-    private func moveToPreviousDownWord() {
-        guard let start = findStartOfCurrentWord() else { return }
-
-        var foundPrevious = false
-
-        for col in stride(from: start.col - 1, through: 0, by: -1) {
-            if clueNumbers[start.row][col] != nil && downClues[start.row][col] {
-                xCoordinate = col
-                yCoordinate = start.row
-                updateIsWordSelected()
-                foundPrevious = true
-                break
-            }
-        }
-
-        if !foundPrevious {
-            for row in stride(from: start.row - 1, through: 0, by: -1) {
-                for col in stride(from: gridSize - 1, through: 0, by: -1) {
-                    if clueNumbers[row][col] != nil && downClues[row][col] {
-                        xCoordinate = col
-                        yCoordinate = row
-                        updateIsWordSelected()
-                        foundPrevious = true
-                        break
-                    }
-                }
-                if foundPrevious { break }
-            }
-        }
-
-        if !foundPrevious {
-            for row in stride(from: gridSize - 1, through: start.row + 1, by: -1) {
-                for col in stride(from: gridSize - 1, through: 0, by: -1) {
-                    if clueNumbers[row][col] != nil && downClues[row][col] {
-                        xCoordinate = col
-                        yCoordinate = row
-                        updateIsWordSelected()
-                        return
-                    }
-                }
-            }
-        }
     }
 
     var body: some View {
@@ -506,7 +139,9 @@ struct CreateCrosswordView: View {
                     }
                 }
                 HStack {
-                    Button(action: previousWord) {
+                    Button(action: {
+                        interactionHandler?.previousWord()
+                    }) {
                         Image(systemName: "arrow.left.circle")
                             .resizable()
                             .frame(width: 40, height: 40)
@@ -532,7 +167,9 @@ struct CreateCrosswordView: View {
                             .cornerRadius(10)
                     }
                     Spacer()
-                    Button(action: nextWord) {
+                    Button(action: {
+                        interactionHandler?.nextWord()
+                    }) {
                         Image(systemName: "arrow.right.circle")
                             .resizable()
                             .frame(width: 40, height: 40)
@@ -542,10 +179,14 @@ struct CreateCrosswordView: View {
                 CrosswordKeyboard(
                     text: selectedBinding,
                     isBlackSquareModeOn: $isBlackSquareModeOn,
-                    onType: increaseSelectedIndex,
-                    onDelete: decreaseSelectedIndex,
+                    onType: {
+                        interactionHandler?.increaseSelectedIndex()
+                    },
+                    onDelete: {
+                        interactionHandler?.decreaseSelectedIndex()
+                    },
                     onBlackSquareToggle: {
-                        toggleBlackSquareMode()
+                        interactionHandler?.toggleBlackSquareMode()
                     }
                 )
                 .frame(height: 200)
@@ -633,17 +274,29 @@ struct CreateCrosswordView: View {
                 .shadow(radius: 10)
                 .padding()
             }
-
         }
         .onChange(of: coordinateKey) { _ in
-            updateIsWordSelected()
+            interactionHandler?.updateIsWordSelected()
         }
         .onChange(of: blockText) { _ in
-            updateClueNumbersIfNeeded()
+            interactionHandler?.updateClueNumbersIfNeeded()
         }
         .onAppear {
-            updateClueNumbers()
-            updateIsWordSelected()
+            interactionHandler = UpdateViewOnUserInteraction(
+                gridSize: gridSize,
+                acrossClues: $acrossClues,
+                downClues: $downClues,
+                clueNumbers: $clueNumbers,
+                blockText: $blockText,
+                isWordSelected: $isWordSelected,
+                isBlackSquareModeOn: $isBlackSquareModeOn,
+                xCoordinate: $xCoordinate,
+                yCoordinate: $yCoordinate,
+                wordEntries: $wordEntries,
+                horizontalType: $horizontalType
+            )
+            interactionHandler?.updateClueNumbers()
+            interactionHandler?.updateIsWordSelected()
         }
         .navigationBarBackButtonHidden(true)
     }
@@ -675,15 +328,15 @@ struct CreateCrosswordView: View {
         var filledWords = Set<String>()
 
         while true {
-            guard let wordWithLeastOptions = getWordWithLeastOptions() else {
+            guard let wordWithLeastOptions = interactionHandler?.getWordWithLeastOptions() else {
                 print("No more words to fill or crossword is complete.")
                 break
             }
 
             let (row, col, direction, _) = wordWithLeastOptions
-            let wordPattern = generatePattern(from: extractWord(at: row, col: col, direction: direction)!)
-            let tableName = "word\(wordPattern.count)"
-            let candidates = getWords(pattern: wordPattern, tableName: tableName)
+            let wordPattern = interactionHandler?.generatePattern(from: interactionHandler?.extractWord(at: row, col: col, direction: direction) ?? "")
+            let tableName = "word\(wordPattern?.count ?? 0)"
+            let candidates = getWords(pattern: wordPattern ?? "", tableName: tableName)
             
             if candidates.isEmpty {
                 print("No candidates found for the word at row \(row) and col \(col). Stopping the algorithm.")
@@ -712,7 +365,6 @@ struct CreateCrosswordView: View {
         }
     }
 
-    
     func generatePattern(from word: String) -> String {
         var pattern = ""
         for char in word {
@@ -883,202 +535,8 @@ struct CreateCrosswordView: View {
             isWordSelected: isWordSelected,
             horizontalTypeToggleAction: {
                 horizontalType.toggle()
-                updateIsWordSelected()
+                interactionHandler?.updateIsWordSelected()
             }
         )
-    }
-
-    func updateAcrossClueNumbers() {
-        for row in 0..<gridSize {
-            for col in 0..<gridSize {
-                if blockText[row][col] != "." {
-                    if col == 0 || blockText[row][col - 1] == "." {
-                        acrossClues[row][col] = true
-                    } else {
-                        acrossClues[row][col] = false
-                    }
-                }
-            }
-        }
-    }
-
-    func updateDownClueNumbers() {
-        for row in 0..<gridSize {
-            for col in 0..<gridSize {
-                if blockText[row][col] != "." {
-                    if row == 0 || blockText[row - 1][col] == "." {
-                        downClues[row][col] = true
-                    } else {
-                        downClues[row][col] = false
-                    }
-                }
-            }
-        }
-    }
-
-    func updateMasterClueNumbers() {
-        var currentClueNumber = 1
-
-        for row in 0..<gridSize {
-            for col in 0..<gridSize {
-                clueNumbers[row][col] = nil
-
-                if acrossClues[row][col] || downClues[row][col] {
-                    clueNumbers[row][col] = currentClueNumber
-                    currentClueNumber += 1
-                }
-            }
-        }
-    }
-
-    func updateClueNumbers() {
-        acrossClues = Array(repeating: Array(repeating: false, count: gridSize), count: gridSize)
-        downClues = Array(repeating: Array(repeating: false, count: gridSize), count: gridSize)
-        clueNumbers = Array(repeating: Array(repeating: nil, count: gridSize), count: gridSize)
-
-        updateAcrossClueNumbers()
-        updateDownClueNumbers()
-        updateMasterClueNumbers()
-        updateWordEntries()
-    }
-    
-    
-    func getWordWithLeastOptions() -> (row: Int, col: Int, direction: WordEntry.Direction, count: Int)? {
-        var minCount = Int.max
-        var result: (row: Int, col: Int, direction: WordEntry.Direction, count: Int)?
-
-        for row in 0..<gridSize {
-            for col in 0..<gridSize {
-                if let clueNumber = clueNumbers[row][col] {
-                    if acrossClues[row][col], let acrossWord = extractWord(at: row, col: col, direction: .across), !isWordFullyFilled(acrossWord) {
-                        let pattern = generatePattern(from: acrossWord)
-                        let tableName = "word\(acrossWord.count)"
-                        let wordCount = getWordCount(for: pattern, tableName: tableName)
-                        if wordCount < minCount {
-                            minCount = wordCount
-                            result = (row, col, .across, wordCount)
-                        }
-                    }
-                    if downClues[row][col], let downWord = extractWord(at: row, col: col, direction: .down), !isWordFullyFilled(downWord) {
-                        let pattern = generatePattern(from: downWord)
-                        let tableName = "word\(downWord.count)"
-                        let wordCount = getWordCount(for: pattern, tableName: tableName)
-                        if wordCount < minCount {
-                            minCount = wordCount
-                            result = (row, col, .down, wordCount)
-                        }
-                    }
-                }
-            }
-        }
-
-        return result
-    }
-
-    func isWordFullyFilled(_ word: String) -> Bool {
-        return !word.contains(" ")
-    }
-
-    func extractWord(at row: Int, col: Int, direction: WordEntry.Direction) -> String? {
-        var word = ""
-        var currentRow = row
-        var currentCol = col
-
-        while currentRow < gridSize, currentCol < gridSize {
-            if blockText[currentRow][currentCol] == "." {
-                break
-            }
-            word.append(blockText[currentRow][currentCol])
-            if direction == .across {
-                currentCol += 1
-            } else {
-                currentRow += 1
-            }
-        }
-
-        return word.isEmpty ? nil : word
-    }
-
-}
-
-
-
-
-
-
-
-struct CrosswordBlock: View {
-    var xIndex: Int
-    var yIndex: Int
-    var tip = -1
-
-    @Binding var selectedXIndex: Int
-    @Binding var selectedYIndex: Int
-    @Binding var text: String
-    @Binding var isBlackSquareModeOn: Bool
-
-    var clueNumber: Int?
-    var blockSize: CGFloat
-    var isWordSelected: Bool
-    var horizontalTypeToggleAction: () -> Void
-
-    var body: some View {
-        let isPeriod = text == "."
-        let isSelected = selectedXIndex == xIndex && selectedYIndex == yIndex
-        let blockColor = getBlockColor(isSelected: isSelected, isWordSelected: isWordSelected, isPeriod: isPeriod)
-
-        return ZStack {
-            if let clueNumber = clueNumber {
-                Text("\(clueNumber)")
-                    .frame(width: blockSize, height: blockSize, alignment: .topLeading)
-                    .font(.system(size: blockSize * 0.25))
-                    .foregroundColor(.black)
-                    .fontWeight(.bold)
-                    .offset(x: blockSize * 0.05, y: 0)
-            }
-
-            Text(isPeriod ? "." : text)
-                .frame(width: blockSize, height: blockSize, alignment: .center)
-                .font(.system(size: blockSize * 0.6))
-                .fontWeight(.bold)
-                .foregroundColor(isPeriod ? .clear : .black)
-        }
-        .foregroundColor(.white)
-        .frame(width: blockSize, height: blockSize)
-        .background(
-            Rectangle()
-                .foregroundColor(blockColor)
-                .cornerRadius(blockSize * 0.1)
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: blockSize * 0.1)
-                .stroke(Color.selectedBlockBorder, lineWidth: isSelected ? blockSize * 0.05 : 0)
-        )
-        .onTapGesture {
-            if isBlackSquareModeOn {
-                text = (text == ".") ? " " : "."
-            } else {
-                if text != "." {
-                    if selectedXIndex == xIndex && selectedYIndex == yIndex {
-                        horizontalTypeToggleAction()
-                    }
-                    selectedXIndex = xIndex
-                    selectedYIndex = yIndex
-                }
-            }
-        }
-
-        func getBlockColor(isSelected: Bool, isWordSelected: Bool, isPeriod: Bool) -> Color {
-            if isPeriod {
-                return .black
-            }
-            if isSelected {
-                return .selectedBlockBackground
-            }
-            if isWordSelected {
-                return .selectedWordBackgroundGood
-            }
-            return .unselectedBlockBackground
-        }
     }
 }
