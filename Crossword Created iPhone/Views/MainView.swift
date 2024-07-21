@@ -18,6 +18,9 @@ import SwiftUI
 //    }
 //}
 
+
+//TEST CHANGES GOR GITHUB COMMIT
+
 struct MainView: View {
     var body: some View {
         NavigationView {
