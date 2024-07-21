@@ -122,6 +122,8 @@
 			isa = PBXGroup;
 			children = (
 				720BC6692B2A91BF0048C2DE /* Crossword_Created_iPhoneApp.swift */,
+				728BA6FA2C4DA58D008AF785 /* Crossword Fill */,
+				728BA6FD2C4DA62A008AF785 /* Data Persistance */,
 				729DC2042B2CF2610059B355 /* Views */,
 				720BC66D2B2A91C00048C2DE /* Assets.xcassets */,
 				720BC66F2B2A91C00048C2DE /* Preview Content */,
@@ -154,21 +156,91 @@
 			path = "Crossword Created iPhoneUITests";
 			sourceTree = "<group>";
 		};
-		729DC2042B2CF2610059B355 /* Views */ = {
+		728BA6F92C4DA52B008AF785 /* Create Crossword */ = {
+			isa = PBXGroup;
+			children = (
+				72299DE32B2BD39A0024EA78 /* CreateCrosswordView.swift */,
+			);
+			path = "Create Crossword";
+			sourceTree = "<group>";
+		};
+		728BA6FA2C4DA58D008AF785 /* Crossword Fill */ = {
+			isa = PBXGroup;
+			children = (
+				729DC20E2B3886D60059B355 /* CrosswordFill.swift */,
+			);
+			path = "Crossword Fill";
+			sourceTree = "<group>";
+		};
+		728BA6FB2C4DA5C2008AF785 /* Main View */ = {
 			isa = PBXGroup;
 			children = (
 				720BC66B2B2A91BF0048C2DE /* MainView.swift */,
-				729DC20E2B3886D60059B355 /* CrosswordFill.swift */,
+			);
+			path = "Main View";
+			sourceTree = "<group>";
+		};
+		728BA6FC2C4DA5D2008AF785 /* Load Or Create */ = {
+			isa = PBXGroup;
+			children = (
 				723891B32C38DD7500A7B7CD /* LoadOrCreateView.swift */,
-				723891B52C38E85900A7B7CD /* KeyboardViewController.swift */,
 				729DC2052B2FACB40059B355 /* CreateSettingsView.swift */,
-				72299DE32B2BD39A0024EA78 /* CreateCrosswordView.swift */,
-				7202B8272C43138000602EB5 /* UIAlertControllerWrapper.swift */,
-				7202B8252C4312EE00602EB5 /* AlertController.swift */,
+			);
+			path = "Load Or Create";
+			sourceTree = "<group>";
+		};
+		728BA6FD2C4DA62A008AF785 /* Data Persistance */ = {
+			isa = PBXGroup;
+			children = (
 				723891B92C39FAE600A7B7CD /* CrosswordDataService.swift */,
-				729DC2092B2FE9C60059B355 /* CreateCluesView.swift */,
+			);
+			path = "Data Persistance";
+			sourceTree = "<group>";
+		};
+		728BA6FE2C4DA6AF008AF785 /* Play */ = {
+			isa = PBXGroup;
+			children = (
 				729DC2072B2FACCF0059B355 /* PlayView.swift */,
+			);
+			path = Play;
+			sourceTree = "<group>";
+		};
+		728BA6FF2C4DA6E4008AF785 /* Add Clues */ = {
+			isa = PBXGroup;
+			children = (
+				729DC2092B2FE9C60059B355 /* CreateCluesView.swift */,
+			);
+			path = "Add Clues";
+			sourceTree = "<group>";
+		};
+		728BA7002C4DA712008AF785 /* Keyboard */ = {
+			isa = PBXGroup;
+			children = (
 				72299DE52B2BD3A90024EA78 /* CrosswordKeyboard.swift */,
+				723891B52C38E85900A7B7CD /* KeyboardViewController.swift */,
+			);
+			path = Keyboard;
+			sourceTree = "<group>";
+		};
+		728BA7012C4DA71B008AF785 /* Alerts */ = {
+			isa = PBXGroup;
+			children = (
+				7202B8252C4312EE00602EB5 /* AlertController.swift */,
+				7202B8272C43138000602EB5 /* UIAlertControllerWrapper.swift */,
+			);
+			path = Alerts;
+			sourceTree = "<group>";
+		};
+		729DC2042B2CF2610059B355 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				728BA6FB2C4DA5C2008AF785 /* Main View */,
+				728BA6FC2C4DA5D2008AF785 /* Load Or Create */,
+				728BA6F92C4DA52B008AF785 /* Create Crossword */,
+				728BA6FE2C4DA6AF008AF785 /* Play */,
+				728BA6FF2C4DA6E4008AF785 /* Add Clues */,
+				728BA7002C4DA712008AF785 /* Keyboard */,
+				728BA7012C4DA71B008AF785 /* Alerts */,
 			);
 			path = Views;
 			sourceTree = "<group>";
